@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>StudentOS 2026 — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f3;--bg2:#fff;--bg3:#f2f0ea;--bg4:#e8e5dc;--bg5:#ddd9ce;
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.13);
+  --text:#17160f;--text2:#5a5849;--text3:#9b9785;
+  --ind:#4338ca;--ind-lt:#eef2ff;--ind-md:#c7d2fe;--ind-dk:#3730a3;
+  --vio:#7c3aed;--vio-lt:#f5f3ff;
+  --grn:#15803d;--grn-lt:#f0fdf4;--grn-md:#bbf7d0;
+  --amb:#b45309;--amb-lt:#fffbeb;--amb-md:#fde68a;
+  --cor:#b91c1c;--cor-lt:#fef2f2;--cor-md:#fecaca;
+  --blu:#1d4ed8;--blu-lt:#eff6ff;--blu-md:#bfdbfe;
+  --tel:#0f766e;--tel-lt:#f0fdfa;
+  --pnk:#be185d;--pnk-lt:#fdf2f8;--pnk-md:#fbcfe8;
+  --ora:#c2410c;--ora-lt:#fff7ed;--ora-md:#fed7aa;
+  --sw:234px;--hh:58px;--r:10px;--rlg:14px;--rxl:20px;
+  --sh0:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03);
+  --sh:0 4px 16px rgba(0,0,0,.06),0 1px 4px rgba(0,0,0,.03);
+  --shl:0 10px 32px rgba(0,0,0,.09),0 4px 8px rgba(0,0,0,.04);
+  --shxl:0 20px 60px rgba(0,0,0,.12),0 8px 16px rgba(0,0,0,.06);
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --serif:'Fraunces',Georgia,serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg3)}::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:4px}
+
+/* ── VIEWS ── */
+.view{display:none}.view.on{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── SHARED BUTTONS/INPUTS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 20px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:none;white-space:nowrap;text-decoration:none}
+.bp{background:var(--ind);color:#fff;box-shadow:0 2px 8px rgba(67,56,202,.3)}.bp:hover{background:var(--ind-dk);box-shadow:0 4px 16px rgba(67,56,202,.4);transform:translateY(-1px)}.bp:active{transform:translateY(0)}
+.bo{background:var(--bg2);color:var(--text2);border:1.5px solid var(--border2)}.bo:hover{background:var(--bg3);color:var(--text)}
+.bgr{background:none;border:none;color:var(--text2);padding:6px 10px;cursor:pointer;font-family:var(--font);font-size:13px}.bgr:hover{color:var(--text)}
+.bsm{padding:7px 14px;font-size:12.5px;border-radius:8px}
+.bfull{width:100%}
+.bload{pointer-events:none;opacity:.7}
+.bload .btn-txt{display:none}.bload .spinner{display:flex !important}
+.spinner{display:none;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.fi{width:100%;padding:10px 14px;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:all .2s}
+.fi:focus{border-color:var(--ind);background:var(--bg2);box-shadow:0 0 0 3px rgba(67,56,202,.1)}
+.fi.err{border-color:var(--cor);box-shadow:0 0 0 3px rgba(185,28,28,.08)}
+.fi::placeholder{color:var(--text3)}
+.fi-wrap{position:relative}.fi-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.fi-ico+.fi{padding-left:40px}
+.fi-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text3);font-size:15px;padding:4px}
+.fi-eye:hover{color:var(--text)}
+.fg{margin-bottom:16px}
+.fl{font-size:12.5px;font-weight:600;color:var(--text2);display:block;margin-bottom:7px}
+.ferr{font-size:12px;color:var(--cor);margin-top:5px;display:none}
+.ferr.on{display:block}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:12px;color:var(--text3);font-weight:500;white-space:nowrap}
+
+/* ══ AUTH PAGES ══ */
+.auth-shell{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.auth-left{background:linear-gradient(135deg,var(--ind) 0%,var(--vio) 100%);padding:60px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.auth-left::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:28px 28px}
+.auth-left-brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.auth-left-brand-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-size:20px}
+.auth-left-brand-name{font-family:var(--serif);font-size:22px;font-weight:700;color:#fff}
+.auth-left-hero{position:relative;z-index:1}
+.auth-left-title{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:900;color:#fff;line-height:1.15;margin-bottom:16px}
+.auth-left-title em{color:rgba(255,255,255,.7);font-style:italic}
+.auth-left-sub{font-size:16px;color:rgba(255,255,255,.75);line-height:1.7;max-width:380px}
+.auth-stat-row{display:flex;gap:28px;position:relative;z-index:1}
+.auth-stat{text-align:center}
+.auth-stat-num{font-family:var(--serif);font-size:28px;font-weight:900;color:#fff;line-height:1}
+.auth-stat-lbl{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px}
+.auth-feat-list{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.auth-feat{display:flex;align-items:center;gap:10px;font-size:13.5px;color:rgba(255,255,255,.85)}
+.auth-feat-icon{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.auth-right{background:var(--bg2);display:flex;align-items:center;justify-content:center;padding:40px;overflow-y:auto}
+.auth-box{width:100%;max-width:420px}
+.auth-title{font-family:var(--serif);font-size:26px;font-weight:900;margin-bottom:6px;letter-spacing:-.3px}
+.auth-sub{color:var(--text2);font-size:14px;margin-bottom:28px}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);position:relative}
+.social-btn:hover{background:var(--bg3);border-color:var(--border2)}
+.social-btn:active{transform:scale(.99)}
+.social-btn .sbico{width:20px;height:20px;flex-shrink:0}
+.social-btns{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
+.auth-switch{text-align:center;margin-top:20px;font-size:13.5px;color:var(--text2)}
+.auth-switch a{color:var(--ind);font-weight:600;cursor:pointer;text-decoration:none}.auth-switch a:hover{text-decoration:underline}
+.terms-note{font-size:12px;color:var(--text3);text-align:center;margin-top:16px;line-height:1.6}
+.terms-note a{color:var(--ind);cursor:pointer}
+.pw-str{height:3px;border-radius:3px;background:var(--bg4);margin-top:8px;overflow:hidden}
+.pw-str-fill{height:100%;border-radius:3px;transition:all .3s;width:0}
+.pw-str-text{font-size:11px;margin-top:4px;font-weight:600}
+.alert{padding:12px 14px;border-radius:9px;font-size:13.5px;margin-bottom:16px;display:none;align-items:center;gap:10px}
+.alert.on{display:flex}
+.alert-err{background:var(--cor-lt);border:1px solid var(--cor-md);color:var(--cor)}
+.alert-ok{background:var(--grn-lt);border:1px solid var(--grn-md);color:var(--grn)}
+.otp-inputs{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.otp-digit{width:52px;height:56px;border-radius:10px;border:2px solid var(--border2);background:var(--bg3);font-size:22px;font-weight:700;text-align:center;font-family:var(--font);color:var(--text);outline:none;transition:all .2s}
+.otp-digit:focus{border-color:var(--ind);background:var(--bg2);box-shadow:0 0 0 3px rgba(67,56,202,.1)}
+.otp-digit.filled{border-color:var(--ind)}
+.otp-resend{text-align:center;margin-top:10px;font-size:13px;color:var(--text2)}
+.otp-resend span{color:var(--ind);font-weight:600;cursor:pointer}
+.otp-resend span.disabled{color:var(--text3);cursor:not-allowed}
+.country-flag{font-size:18px;margin-right:4px}
+.phone-wrap{display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;transition:.2s;background:var(--bg3)}
+.phone-wrap:focus-within{border-color:var(--ind);background:var(--bg2);box-shadow:0 0 0 3px rgba(67,56,202,.1)}
+.phone-cc{padding:10px 12px;background:var(--bg3);border-right:1px solid var(--border);font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;transition:.2s}
+.phone-num{flex:1;padding:10px 14px;background:transparent;border:none;outline:none;font-family:var(--font);font-size:14px;color:var(--text)}
+.phone-num::placeholder{color:var(--text3)}
+@media(max-width:900px){.auth-shell{grid-template-columns:1fr}.auth-left{display:none}.auth-right{padding:32px 20px;min-height:100vh}}
+
+/* ══ ONBOARDING ══ */
+.ob-shell{min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:32px 20px}
+.ob-inner{width:100%;max-width:560px}
+.ob-progress{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:32px}
+.ob-step{display:flex;align-items:center;gap:0}
+.ob-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .3s;background:var(--bg4);color:var(--text3);flex-shrink:0}
+.ob-dot.on{background:var(--ind);color:#fff;box-shadow:0 0 0 4px rgba(67,56,202,.15)}
+.ob-dot.done{background:var(--grn);color:#fff}
+.ob-line{height:2px;width:50px;background:var(--bg4);transition:all .3s}
+.ob-line.done{background:var(--grn)}
+.ob-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);padding:32px;box-shadow:var(--sh)}
+.ob-step-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:var(--ind-lt);color:var(--ind);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px}
+.ob-title{font-family:var(--serif);font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.3px}
+.ob-sub{color:var(--text2);font-size:13.5px;margin-bottom:24px;line-height:1.6}
+.ob-panel{display:none}.ob-panel.on{display:block;animation:fade .3s ease}
+.yr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.yr-btn{padding:11px;border-radius:9px;border:2px solid var(--border2);background:var(--bg3);text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;color:var(--text2)}
+.yr-btn:hover{border-color:var(--ind);color:var(--ind);background:var(--ind-lt)}.yr-btn.on{border-color:var(--ind);color:var(--ind);background:var(--ind-lt)}
+.lvl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.lvl-btn{padding:14px 10px;border-radius:10px;border:2px solid var(--border2);background:var(--bg3);text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.lvl-btn:hover{border-color:var(--ind);background:var(--ind-lt)}.lvl-btn.on{border-color:var(--ind);background:var(--ind-lt)}
+.dom-grid-ob{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.dom-btn{padding:13px 14px;border-radius:10px;border:2px solid var(--border2);background:var(--bg3);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;text-align:center}
+.dom-btn:hover{border-color:var(--ind);background:var(--ind-lt)}.dom-btn.on{border-color:var(--ind);background:var(--ind-lt);color:var(--ind)}
+.ob-nav{display:flex;gap:10px;margin-top:24px}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.ti{background:var(--ind-lt);color:var(--ind)}.tg{background:var(--grn-lt);color:var(--grn)}.ta{background:var(--amb-lt);color:var(--amb)}.tc{background:var(--cor-lt);color:var(--cor)}.tb{background:var(--blu-lt);color:var(--blu)}.tt{background:var(--tel-lt);color:var(--tel)}.tp2{background:var(--pnk-lt);color:var(--pnk)}.tn{background:var(--bg3);color:var(--text2)}
+
+/* ══ APP LAYOUT ══ */
+#app{display:none}
+#app.on{display:block}
+.app-header{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--hh);background:rgba(248,247,243,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px 0 calc(var(--sw) + 18px);gap:12px}
+.hs{flex:1;max-width:380px;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:8px 13px;transition:.2s}
+.hs:focus-within{border-color:var(--ind);background:var(--bg2);box-shadow:0 0 0 3px rgba(67,56,202,.1)}
+.hs input{background:none;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:13.5px;width:100%}
+.hs input::placeholder{color:var(--text3)}
+.hright{display:flex;align-items:center;gap:7px;margin-left:auto}
+.hb{width:36px;height:36px;border-radius:9px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:.2s;color:var(--text2);position:relative}
+.hb:hover{background:var(--bg4);color:var(--text)}
+.hb .nd{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--cor);border-radius:50%;border:2px solid var(--bg)}
+.hav{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--ind),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;cursor:pointer;box-shadow:var(--sh0)}
+aside{position:fixed;top:var(--hh);left:0;bottom:0;width:var(--sw);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;z-index:100;padding:0 0 16px}
+.sbb{padding:13px 16px;border-bottom:1px solid rgba(0,0,0,.04);display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.sbi{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--ind),var(--vio));display:flex;align-items:center;justify-content:center;font-size:16px}
+.sbn{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--ind)}
+.sbn span{color:var(--text3);font-family:var(--font);font-weight:400}
+.ns{padding:4px 0}.nsl{padding:7px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--text3)}
+.nl{display:flex;align-items:center;gap:9px;padding:9px 16px;color:var(--text2);font-size:13.5px;font-weight:500;cursor:pointer;transition:.15s;border-left:3px solid transparent}
+.nl:hover{background:var(--bg3);color:var(--text)}.nl.on{background:var(--ind-lt);color:var(--ind);border-left-color:var(--ind);font-weight:600}
+.ni{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nb{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--cor-lt);color:var(--cor)}
+.nb.g{background:var(--grn-lt);color:var(--grn)}.nb.b{background:var(--blu-lt);color:var(--blu)}
+.sd{height:1px;background:rgba(0,0,0,.04);margin:7px 16px}
+.sf{margin-top:auto;padding:12px}
+.pp{background:linear-gradient(135deg,var(--ind),var(--vio));border-radius:var(--rlg);padding:14px;color:#fff}
+.pp .ppl{font-size:10px;opacity:.75;text-transform:uppercase;letter-spacing:1px}
+.pp .ppt{font-family:var(--serif);font-size:14px;font-weight:700;margin:2px 0 10px}
+.pp button{width:100%;padding:7px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:7px;color:#fff;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:.2s}.pp button:hover{background:rgba(255,255,255,.3)}
+main{margin-top:var(--hh);margin-left:var(--sw);padding:28px 32px;min-height:calc(100vh - var(--hh))}
+.page{display:none;animation:fade .3s ease}.page.on{display:block}
+.pgt{font-family:var(--serif);font-size:26px;font-weight:900;letter-spacing:-.4px;margin-bottom:4px}
+.pgs{color:var(--text2);font-size:14px;margin-bottom:24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:var(--sh0);transition:.2s}
+.card:hover{box-shadow:var(--sh);border-color:var(--border2)}
+.cf{background:var(--bg3);border:1px solid rgba(0,0,0,.04);border-radius:var(--rlg);padding:18px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sect{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:12px}
+.bw{background:var(--bg4);border-radius:20px;overflow:hidden}
+.bf{border-radius:20px;transition:width .6s ease}
+.tabs{display:flex;border-bottom:2px solid var(--bg4);margin-bottom:22px;flex-wrap:wrap}
+.tab{padding:10px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:.18s;white-space:nowrap}
+.tab:hover{color:var(--text)}.tab.on{color:var(--ind);border-bottom-color:var(--ind);font-weight:700}
+.tp{display:none}.tp.on{display:block;animation:fade .25s}
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
+.overlay.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);padding:32px;max-width:480px;width:100%;position:relative;box-shadow:var(--shxl);animation:fade .25s;max-height:92vh;overflow-y:auto}
+.mc2{position:absolute;top:12px;right:14px;background:var(--bg3);border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--text2)}.mc2:hover{background:var(--bg4)}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:10px 0 env(safe-area-inset-bottom,8px);z-index:300;justify-content:space-around}
+.mni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:500;color:var(--text3);cursor:pointer;padding:0 12px}.mni.on{color:var(--ind)}.mic{font-size:20px}
+.mod-c{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rlg);padding:16px 14px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.mod-c::after{content:'';position:absolute;bottom:-14px;right:-14px;width:60px;height:60px;border-radius:50%;opacity:0;transition:.2s}
+.mod-c:hover{transform:translateY(-2px);box-shadow:var(--sh);border-color:var(--border2)}.mod-c:hover::after{opacity:1}
+.ci::after{background:var(--ind)}.ct::after{background:var(--tel)}.ca::after{background:var(--amb)}.cg::after{background:var(--grn)}.cb2::after{background:var(--blu)}.cp::after{background:var(--pnk)}.co::after{background:var(--ora)}
+.mi2{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}.mt2{font-family:var(--serif);font-weight:700;font-size:13.5px;margin-bottom:2px}.ms2{font-size:11.5px;color:var(--text2)}
+
+/* Loading screen */
+.loading-screen{position:fixed;inset:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .4s}
+.loading-screen.hidden{opacity:0;pointer-events:none}
+.loading-inner{text-align:center}
+.loading-logo{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--ind),var(--vio));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;animation:pulse 1.5s ease-in-out infinite}
+.loading-text{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--ind)}
+.loading-sub{color:var(--text3);font-size:13px;margin-top:6px}
+
+@media(max-width:900px){
+  aside{display:none}.app-header{padding-left:16px}
+  main{margin-left:0;padding:20px 16px 80px}.mob-nav{display:flex}
+  .g4,.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}
+}
+@media(max-width:560px){.g3{grid-template-columns:1fr}.g4{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loading">
+  <div class="loading-inner">
+    <div class="loading-logo">🎓</div>
+    <div class="loading-text">StudentOS 2026</div>
+    <div class="loading-sub">Loading your dashboard…</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     AUTH VIEWS
+══════════════════════════════════════════════ -->
+
+<!-- LOGIN -->
+<div id="view-login" class="view">
+  <div class="auth-shell">
+    <!-- Left panel -->
+    <div class="auth-left">
+      <div class="auth-left-brand">
+        <div class="auth-left-brand-icon">🎓</div>
+        <span class="auth-left-brand-name">StudentOS</span>
+      </div>
+      <div class="auth-left-hero">
+        <div class="auth-left-title">India's #1<br>Engineering<br><em>Student Platform</em></div>
+        <div class="auth-left-sub">From first year to first job — roadmaps, DSA sheets, internships, resume builder, and AI guidance. All in one place.</div>
+      </div>
+      <div class="auth-feat-list">
+        <div class="auth-feat"><div class="auth-feat-icon">⚡</div>DSA Sheets — 300 problems across 3 levels</div>
+        <div class="auth-feat"><div class="auth-feat-icon">💼</div>48+ live internship listings matched to you</div>
+        <div class="auth-feat"><div class="auth-feat-icon">🤖</div>AI Study Buddy & ATS Resume Scorer</div>
+        <div class="auth-feat"><div class="auth-feat-icon">🗺️</div>4-year roadmap + personalized weekly plan</div>
+      </div>
+      <div class="auth-stat-row">
+        <div class="auth-stat"><div class="auth-stat-num">50k+</div><div class="auth-stat-lbl">Students</div></div>
+        <div class="auth-stat"><div class="auth-stat-num">500+</div><div class="auth-stat-lbl">Resources</div></div>
+        <div class="auth-stat"><div class="auth-stat-num">🆓</div><div class="auth-stat-lbl">Free Forever</div></div>
+      </div>
+    </div>
+
+    <!-- Right panel — Login form -->
+    <div class="auth-right">
+      <div class="auth-box">
+        <div style="font-size:36px;margin-bottom:12px">👋</div>
+        <div class="auth-title">Welcome back</div>
+        <div class="auth-sub">Sign in to continue your journey</div>
+
+        <!-- Alert -->
+        <div class="alert alert-err" id="login-alert">
+          <span>⚠️</span><span id="login-alert-msg">Error message</span>
+        </div>
+
+        <!-- Social login -->
+        <div class="social-btns">
+          <button class="social-btn" onclick="authGoogle()" id="btn-google">
+            <svg class="sbico" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            <span class="btn-txt">Continue with Google</span>
+            <div class="spinner"></div>
+          </button>
+        </div>
+
+        <div class="divider"><span>or sign in with email</span></div>
+
+        <!-- Email/Password form -->
+        <form onsubmit="return false" id="login-form">
+          <div class="fg">
+            <label class="fl">Email address</label>
+            <div class="fi-wrap">
+              <span class="fi-ico">✉️</span>
+              <input class="fi" type="email" id="login-email" placeholder="you@college.edu" autocomplete="email">
+            </div>
+            <div class="ferr" id="err-login-email">Please enter a valid email</div>
+          </div>
+          <div class="fg">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+              <label class="fl" style="margin:0">Password</label>
+              <a style="font-size:12.5px;color:var(--ind);cursor:pointer;font-weight:600" onclick="showView('view-forgot')">Forgot password?</a>
+            </div>
+            <div class="fi-wrap">
+              <span class="fi-ico">🔒</span>
+              <input class="fi" type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+              <span class="fi-eye" onclick="togglePW('login-password',this)">👁️</span>
+            </div>
+            <div class="ferr" id="err-login-pw">Password is required</div>
+          </div>
+          <button class="btn bp bfull" onclick="authEmail()" id="btn-login">
+            <span class="btn-txt">Sign In →</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="divider"><span>or</span></div>
+
+        <!-- Phone OTP -->
+        <button class="btn bo bfull" onclick="showView('view-phone')">
+          📱 Sign in with Phone OTP
+        </button>
+
+        <div class="auth-switch" style="margin-top:20px">
+          Don't have an account? <a onclick="showView('view-register')">Create one free →</a>
+        </div>
+        <div class="terms-note">By continuing you agree to our <a>Terms of Service</a> and <a>Privacy Policy</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="view-register" class="view">
+  <div class="auth-shell">
+    <div class="auth-left">
+      <div class="auth-left-brand"><div class="auth-left-brand-icon">🎓</div><span class="auth-left-brand-name">StudentOS</span></div>
+      <div class="auth-left-hero">
+        <div class="auth-left-title">Start your<br><em>engineering</em><br>journey today</div>
+        <div class="auth-left-sub">Free forever. No credit card. Personalized for your branch, year, and goals.</div>
+      </div>
+      <div class="auth-feat-list">
+        <div class="auth-feat"><div class="auth-feat-icon">🌱</div>Beginner Zone — perfect for Year 1 students</div>
+        <div class="auth-feat"><div class="auth-feat-icon">📊</div>CGPA predictor & semester planner</div>
+        <div class="auth-feat"><div class="auth-feat-icon">🏆</div>Hackathon tracker + TeamUp to find teammates</div>
+        <div class="auth-feat"><div class="auth-feat-icon">📄</div>ATS resume scorer — get above 85 before applying</div>
+      </div>
+      <div class="auth-stat-row">
+        <div class="auth-stat"><div class="auth-stat-num">₹0</div><div class="auth-stat-lbl">Forever Free</div></div>
+        <div class="auth-stat"><div class="auth-stat-num">2 min</div><div class="auth-stat-lbl">Setup Time</div></div>
+        <div class="auth-stat"><div class="auth-stat-num">50k+</div><div class="auth-stat-lbl">Students</div></div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-box">
+        <div style="font-size:36px;margin-bottom:12px">🚀</div>
+        <div class="auth-title">Create your account</div>
+        <div class="auth-sub">Free forever · Takes 2 minutes</div>
+
+        <div class="alert alert-err" id="reg-alert"><span>⚠️</span><span id="reg-alert-msg"></span></div>
+
+        <div class="social-btns">
+          <button class="social-btn" onclick="authGoogle()" id="btn-google-reg">
+            <svg class="sbico" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            <span class="btn-txt">Sign up with Google</span>
+            <div class="spinner"></div>
+          </button>
+        </div>
+
+        <div class="divider"><span>or register with email</span></div>
+
+        <form onsubmit="return false">
+          <div class="fg">
+            <label class="fl">Full Name</label>
+            <div class="fi-wrap"><span class="fi-ico">👤</span><input class="fi" type="text" id="reg-name" placeholder="Arjun Kumar" autocomplete="name"></div>
+            <div class="ferr" id="err-reg-name">Please enter your name</div>
+          </div>
+          <div class="fg">
+            <label class="fl">Email address</label>
+            <div class="fi-wrap"><span class="fi-ico">✉️</span><input class="fi" type="email" id="reg-email" placeholder="arjun@college.edu" autocomplete="email"></div>
+            <div class="ferr" id="err-reg-email">Please enter a valid email</div>
+          </div>
+          <div class="fg">
+            <label class="fl">Password</label>
+            <div class="fi-wrap">
+              <span class="fi-ico">🔒</span>
+              <input class="fi" type="password" id="reg-password" placeholder="Min. 8 characters" oninput="checkPWStrength(this.value)" autocomplete="new-password">
+              <span class="fi-eye" onclick="togglePW('reg-password',this)">👁️</span>
+            </div>
+            <div class="pw-str"><div class="pw-str-fill" id="pw-fill"></div></div>
+            <div class="pw-str-text" id="pw-str-text" style="color:var(--text3);font-size:11px;margin-top:4px"></div>
+            <div class="ferr" id="err-reg-pw">Password must be at least 8 characters</div>
+          </div>
+          <div class="fg" style="display:flex;align-items:flex-start;gap:9px;margin-bottom:20px">
+            <input type="checkbox" id="reg-agree" style="margin-top:3px;accent-color:var(--ind);width:15px;height:15px;cursor:pointer">
+            <label for="reg-agree" style="font-size:13px;color:var(--text2);cursor:pointer">I agree to the <a style="color:var(--ind);font-weight:600">Terms</a> and <a style="color:var(--ind);font-weight:600">Privacy Policy</a></label>
+          </div>
+          <button class="btn bp bfull" onclick="authRegister()" id="btn-register">
+            <span class="btn-txt">Create Free Account →</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="auth-switch">Already have an account? <a onclick="showView('view-login')">Sign in →</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHONE OTP -->
+<div id="view-phone" class="view">
+  <div class="auth-shell">
+    <div class="auth-left">
+      <div class="auth-left-brand"><div class="auth-left-brand-icon">🎓</div><span class="auth-left-brand-name">StudentOS</span></div>
+      <div class="auth-left-hero">
+        <div class="auth-left-title">Login with<br><em>Phone OTP</em></div>
+        <div class="auth-left-sub">No password needed. We'll send you a 6-digit OTP on your Indian mobile number.</div>
+      </div>
+      <div class="auth-feat-list">
+        <div class="auth-feat"><div class="auth-feat-icon">🔒</div>Bank-grade secure OTP verification</div>
+        <div class="auth-feat"><div class="auth-feat-icon">⚡</div>OTP delivered in under 10 seconds</div>
+        <div class="auth-feat"><div class="auth-feat-icon">🇮🇳</div>Works with all Indian carriers (Jio, Airtel, BSNL, Vi)</div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-box">
+
+        <!-- Step 1: Enter Phone -->
+        <div id="phone-step1">
+          <div style="font-size:36px;margin-bottom:12px">📱</div>
+          <div class="auth-title">Enter your phone number</div>
+          <div class="auth-sub">We'll send a 6-digit OTP to verify</div>
+          <div class="alert alert-err" id="phone-alert"><span>⚠️</span><span id="phone-alert-msg"></span></div>
+          <div class="fg">
+            <label class="fl">Mobile Number</label>
+            <div class="phone-wrap">
+              <div class="phone-cc" onclick="toggleCC()">
+                <span class="country-flag">🇮🇳</span><span id="cc-code">+91</span>
+                <span style="font-size:10px;color:var(--text3)">▼</span>
+              </div>
+              <input class="phone-num" type="tel" id="phone-number" placeholder="9876543210" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+            </div>
+            <div class="ferr" id="err-phone">Enter a valid 10-digit number</div>
+          </div>
+          <!-- reCAPTCHA container (Firebase needs this) -->
+          <div id="recaptcha-container" style="margin-bottom:16px"></div>
+          <button class="btn bp bfull" onclick="sendOTP()" id="btn-send-otp">
+            <span class="btn-txt">Send OTP →</span>
+            <div class="spinner"></div>
+          </button>
+          <div class="auth-switch" style="margin-top:16px"><a onclick="showView('view-login')">← Back to sign in</a></div>
+        </div>
+
+        <!-- Step 2: Enter OTP -->
+        <div id="phone-step2" style="display:none">
+          <div style="font-size:36px;margin-bottom:12px">🔐</div>
+          <div class="auth-title">Enter OTP</div>
+          <div class="auth-sub" id="otp-sent-to">OTP sent to +91 XXXXXXXXXX</div>
+          <div class="alert alert-err" id="otp-alert"><span>⚠️</span><span id="otp-alert-msg"></span></div>
+          <div class="alert alert-ok" id="otp-ok"><span>✅</span><span>OTP sent successfully!</span></div>
+
+          <div class="otp-inputs" id="otp-inputs">
+            <input class="otp-digit" maxlength="1" type="tel" oninput="otpInput(this)" onkeydown="otpKeydown(event,this)">
+            <input class="otp-digit" maxlength="1" type="tel" oninput="otpInput(this)" onkeydown="otpKeydown(event,this)">
+            <input class="otp-digit" maxlength="1" type="tel" oninput="otpInput(this)" onkeydown="otpKeydown(event,this)">
+            <input class="otp-digit" maxlength="1" type="tel" oninput="otpInput(this)" onkeydown="otpKeydown(event,this)">
+            <input class="otp-digit" maxlength="1" type="tel" oninput="otpInput(this)" onkeydown="otpKeydown(event,this)">
+            <input class="otp-digit" maxlength="1" type="tel" oninput="otpInput(this)" onkeydown="otpKeydown(event,this)">
+          </div>
+
+          <div class="otp-resend">
+            <span id="resend-timer">Resend OTP in <strong id="resend-count">30</strong>s</span>
+            <span id="resend-btn" style="display:none;color:var(--ind);cursor:pointer;font-weight:600" onclick="resendOTP()">Resend OTP</span>
+          </div>
+
+          <button class="btn bp bfull" style="margin-top:20px" onclick="verifyOTP()" id="btn-verify-otp">
+            <span class="btn-txt">Verify & Continue →</span>
+            <div class="spinner"></div>
+          </button>
+          <div style="text-align:center;margin-top:12px"><a class="bgr" onclick="document.getElementById('phone-step2').style.display='none';document.getElementById('phone-step1').style.display='block'">← Change number</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div id="view-forgot" class="view">
+  <div class="auth-shell">
+    <div class="auth-left">
+      <div class="auth-left-brand"><div class="auth-left-brand-icon">🎓</div><span class="auth-left-brand-name">StudentOS</span></div>
+      <div class="auth-left-hero">
+        <div class="auth-left-title">Reset your<br><em>password</em></div>
+        <div class="auth-left-sub">We'll send a reset link to your email. Check your inbox within 2 minutes.</div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-box">
+        <div style="font-size:36px;margin-bottom:12px">🔑</div>
+        <div class="auth-title">Forgot password?</div>
+        <div class="auth-sub">Enter your email and we'll send a reset link</div>
+        <div class="alert alert-err" id="forgot-alert"><span>⚠️</span><span id="forgot-alert-msg"></span></div>
+        <div class="alert alert-ok" id="forgot-ok"><span>✅</span><span>Reset link sent! Check your inbox.</span></div>
+        <div class="fg">
+          <label class="fl">Email address</label>
+          <div class="fi-wrap"><span class="fi-ico">✉️</span><input class="fi" type="email" id="forgot-email" placeholder="you@college.edu"></div>
+        </div>
+        <button class="btn bp bfull" onclick="sendReset()" id="btn-forgot">
+          <span class="btn-txt">Send Reset Link →</span>
+          <div class="spinner"></div>
+        </button>
+        <div class="auth-switch" style="margin-top:16px"><a onclick="showView('view-login')">← Back to sign in</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     ONBOARDING
+══════════════════════════════════════════════ -->
+<div id="view-onboarding" class="view">
+  <div class="ob-shell">
+    <div class="ob-inner">
+      <!-- Progress -->
+      <div class="ob-progress">
+        <div class="ob-step"><div class="ob-dot on" id="od1">1</div></div>
+        <div class="ob-step"><div class="ob-line" id="ol1"></div><div class="ob-dot" id="od2">2</div></div>
+        <div class="ob-step"><div class="ob-line" id="ol2"></div><div class="ob-dot" id="od3">3</div></div>
+        <div class="ob-step"><div class="ob-line" id="ol3"></div><div class="ob-dot" id="od4">4</div></div>
+      </div>
+
+      <div class="ob-card">
+        <!-- Step 1: College details -->
+        <div class="ob-panel on" id="ob1">
+          <div class="ob-step-badge">Step 1 of 4 · About You</div>
+          <div class="ob-title">Tell us about yourself 👤</div>
+          <div class="ob-sub">We'll use this to personalize internships, roadmaps, and your dashboard.</div>
+          <div class="fg"><label class="fl">Your College</label><input class="fi" id="ob-college" placeholder="e.g. IIT Ropar, NIT Trichy, VIT…"></div>
+          <div class="fg"><label class="fl">Branch</label>
+            <select class="fi" id="ob-branch">
+              <option value="">Select your branch</option>
+              <option>CSE — Computer Science & Engineering</option>
+              <option>IT — Information Technology</option>
+              <option>ECE — Electronics & Communication</option>
+              <option>EEE — Electrical & Electronics</option>
+              <option>Mechanical Engineering</option>
+              <option>Civil Engineering</option>
+              <option>Chemical Engineering</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Current CGPA (optional)</label><input class="fi" id="ob-cgpa" type="number" step="0.1" min="0" max="10" placeholder="e.g. 7.8"></div>
+          <div class="ob-nav">
+            <button class="btn bp" style="flex:1" onclick="obNext(2)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Year & Level -->
+        <div class="ob-panel" id="ob2">
+          <div class="ob-step-badge">Step 2 of 4 · Academic Stage</div>
+          <div class="ob-title">Which year are you in? 📅</div>
+          <div class="ob-sub">This helps us show you the right roadmap and set difficulty.</div>
+          <div class="fg">
+            <label class="fl">Current Year</label>
+            <div class="yr-grid" id="ob-yr-grid">
+              <div class="yr-btn" onclick="selOb('yr',1,this)">Year 1<br><span style="font-size:10px;font-weight:400;color:var(--text3)">1st-2nd sem</span></div>
+              <div class="yr-btn" onclick="selOb('yr',2,this)">Year 2<br><span style="font-size:10px;font-weight:400;color:var(--text3)">3rd-4th sem</span></div>
+              <div class="yr-btn" onclick="selOb('yr',3,this)">Year 3<br><span style="font-size:10px;font-weight:400;color:var(--text3)">5th-6th sem</span></div>
+              <div class="yr-btn" onclick="selOb('yr',4,this)">Year 4<br><span style="font-size:10px;font-weight:400;color:var(--text3)">Final year</span></div>
+            </div>
+          </div>
+          <div class="fg" style="margin-top:20px">
+            <label class="fl">Your current coding level</label>
+            <div class="lvl-grid">
+              <div class="lvl-btn" onclick="selOb('lvl','beginner',this)"><div style="font-size:22px;margin-bottom:6px">🌱</div><div style="font-size:13px;font-weight:700">Beginner</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Just started or<br>first semester</div></div>
+              <div class="lvl-btn" onclick="selOb('lvl','intermediate',this)"><div style="font-size:22px;margin-bottom:6px">⚡</div><div style="font-size:13px;font-weight:700">Intermediate</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Know basics,<br>doing easy LeetCode</div></div>
+              <div class="lvl-btn" onclick="selOb('lvl','advanced',this)"><div style="font-size:22px;margin-bottom:6px">🔥</div><div style="font-size:13px;font-weight:700">Advanced</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Medium-Hard<br>LeetCode</div></div>
+            </div>
+          </div>
+          <div class="ob-nav">
+            <button class="btn bo" style="width:100px" onclick="obBack(1)">← Back</button>
+            <button class="btn bp" style="flex:1" onclick="obNext(3)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Goals -->
+        <div class="ob-panel" id="ob3">
+          <div class="ob-step-badge">Step 3 of 4 · Your Goals</div>
+          <div class="ob-title">What's your target? 🎯</div>
+          <div class="ob-sub">We'll build your roadmap around these goals.</div>
+          <div class="fg">
+            <label class="fl">Target Role</label>
+            <select class="fi" id="ob-role">
+              <option>SDE at Product Company (Swiggy, Razorpay, Flipkart)</option>
+              <option>SDE at FAANG / Top MNC (Google, Microsoft, Amazon)</option>
+              <option>SDE at Startup (early-stage)</option>
+              <option>ML / AI Engineer</option>
+              <option>Data Scientist / Analyst</option>
+              <option>Full Stack Web Developer</option>
+              <option>Cloud / DevOps Engineer</option>
+              <option>Exploring — not sure yet</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Target Package (LPA)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+              <div class="yr-btn" onclick="selOb('pkg','8-15',this)" style="padding:12px 8px">8–15 LPA<br><span style="font-size:10px;font-weight:400;color:var(--text3)">Good product companies</span></div>
+              <div class="yr-btn" onclick="selOb('pkg','15-25',this)" style="padding:12px 8px">15–25 LPA<br><span style="font-size:10px;font-weight:400;color:var(--text3)">Strong product cos.</span></div>
+              <div class="yr-btn" onclick="selOb('pkg','25-40',this)" style="padding:12px 8px">25–40 LPA<br><span style="font-size:10px;font-weight:400;color:var(--text3)">FAANG-adjacent</span></div>
+              <div class="yr-btn" onclick="selOb('pkg','40+',this)" style="padding:12px 8px">40+ LPA<br><span style="font-size:10px;font-weight:400;color:var(--text3)">FAANG / top-tier</span></div>
+            </div>
+          </div>
+          <div class="ob-nav">
+            <button class="btn bo" style="width:100px" onclick="obBack(2)">← Back</button>
+            <button class="btn bp" style="flex:1" onclick="obNext(4)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Domain -->
+        <div class="ob-panel" id="ob4">
+          <div class="ob-step-badge">Step 4 of 4 · Your Domain</div>
+          <div class="ob-title">Pick your focus domain 🗺️</div>
+          <div class="ob-sub">Choose 1–2. You can change this later. Not sure? We'll help you figure it out in the Beginner Zone.</div>
+          <div class="dom-grid-ob" id="ob-dom-grid">
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="SDE">⚡ SDE / Backend</div>
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="Web">🌐 Web / Full Stack</div>
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="AIML">🤖 AI / ML / GenAI</div>
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="Cloud">☁️ Cloud / DevOps</div>
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="Data">📊 Data Science</div>
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="Security">🛡️ Cybersecurity</div>
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="Mobile">📱 Mobile Dev</div>
+            <div class="dom-btn" onclick="toggleDom(this)" data-d="Notsure">🤔 Not sure yet</div>
+          </div>
+          <div class="ob-nav" style="margin-top:20px">
+            <button class="btn bo" style="width:100px" onclick="obBack(3)">← Back</button>
+            <button class="btn bp" style="flex:1;font-size:15px" onclick="launchApp()" id="btn-launch">
+              <span class="btn-txt">🚀 Launch My Dashboard →</span>
+              <div class="spinner"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════════ -->
+<div id="app">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="hs">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search internships, problems, resources…">
+    </div>
+    <div class="hright">
+      <div class="hb" onclick="toggleNotif()" title="Notifications">🔔<span class="nd"></span></div>
+      <div class="hb" style="background:var(--ind-lt);border-color:var(--ind-md)" onclick="toggleAI()" title="AI Buddy">🤖</div>
+      <div class="hav" id="h-avatar" onclick="go('profile')">AK</div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="sbb"><div class="sbi">🎓</div><div class="sbn">Student<span>OS</span></div></div>
+    <div class="ns"><div class="nsl">Overview</div><div class="nl on" onclick="go('dashboard')"><span class="ni">🏠</span>Dashboard</div></div>
+    <div class="ns">
+      <div class="nsl">Career & Prep</div>
+      <div class="nl" onclick="go('internships')"><span class="ni">💼</span>Internships<span class="nb">12</span></div>
+      <div class="nl" onclick="go('roadmaps')"><span class="ni">🗺️</span>Roadmaps</div>
+      <div class="nl" onclick="go('dsa')"><span class="ni">⚡</span>DSA Sheets</div>
+    </div>
+    <div class="ns">
+      <div class="nsl">Learning</div>
+      <div class="nl" onclick="go('beginner')"><span class="ni">🌱</span>Beginner Zone<span class="nb b">New</span></div>
+      <div class="nl" onclick="go('resources')"><span class="ni">📚</span>Resources</div>
+    </div>
+    <div class="sd"></div>
+    <div class="ns">
+      <div class="nsl">Tools</div>
+      <div class="nl" onclick="go('resume')"><span class="ni">📄</span>Resume + ATS</div>
+      <div class="nl" onclick="go('hackathons')"><span class="ni">🏆</span>Hackathons<span class="nb g">3</span></div>
+      <div class="nl" onclick="go('leaderboard')"><span class="ni">🥇</span>Leaderboard</div>
+      <div class="nl" onclick="go('profile')"><span class="ni">👤</span>My Profile</div>
+    </div>
+    <div class="sd"></div>
+    <div class="sf"><div class="pp"><div class="ppl">Current Plan</div><div class="ppt">Free Tier</div><button onclick="showMod('upgrade')">✨ Upgrade to Pro</button></div></div>
+  </aside>
+
+  <main>
+    <!-- Dashboard -->
+    <div id="dashboard" class="page on">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div><div style="font-family:var(--serif);font-size:22px;font-weight:900" id="dash-greeting">Good morning! 👋</div><div style="color:var(--text2);font-size:13.5px" id="dash-sub">Welcome to StudentOS</div></div>
+        <button class="btn bo bsm" onclick="go('profile')">Edit Profile</button>
+      </div>
+
+      <!-- Profile hero -->
+      <div id="profile-hero" style="background:linear-gradient(120deg,#eef2ff 0%,#f5f3ff 50%,#fdf2f8 100%);border:1.5px solid var(--ind-md);border-radius:var(--rxl);padding:20px 24px;display:flex;align-items:center;gap:18px;margin-bottom:24px;position:relative;overflow:hidden">
+        <div style="position:absolute;right:-50px;top:-50px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(67,56,202,.07),transparent 70%);pointer-events:none"></div>
+        <div id="profile-av" style="width:52px;height:52px;border-radius:13px;background:linear-gradient(135deg,var(--ind),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-weight:700;font-size:20px;box-shadow:var(--sh);flex-shrink:0">AK</div>
+        <div style="flex:1">
+          <div style="font-family:var(--serif);font-weight:700;font-size:17px;margin-bottom:6px" id="profile-name">Your Name</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px" id="profile-tags">
+            <span class="tag ti">Loading…</span>
+          </div>
+        </div>
+        <button class="btn bo bsm" onclick="go('profile')" style="flex-shrink:0">Edit</button>
+      </div>
+
+      <div class="sect">Modules</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:26px">
+        <div class="mod-c ci" onclick="go('internships')"><div class="mi2" style="background:var(--ind-lt)">💼</div><div class="mt2">Internships</div><div class="ms2">48 new matches</div></div>
+        <div class="mod-c ct" onclick="go('roadmaps')"><div class="mi2" style="background:var(--tel-lt)">🗺️</div><div class="mt2">Roadmaps</div><div class="ms2">SDE path active</div></div>
+        <div class="mod-c ca" onclick="go('dsa')"><div class="mi2" style="background:var(--amb-lt)">⚡</div><div class="mt2">DSA Sheets</div><div class="ms2">300 problems</div></div>
+        <div class="mod-c cg" onclick="go('beginner')"><div class="mi2" style="background:var(--grn-lt)">🌱</div><div class="mt2">Beginner Zone</div><div class="ms2">Start here</div></div>
+        <div class="mod-c cb2" onclick="go('resume')"><div class="mi2" style="background:var(--blu-lt)">📄</div><div class="mt2">Resume + ATS</div><div class="ms2">AI scorer</div></div>
+        <div class="mod-c cp" onclick="go('hackathons')"><div class="mi2" style="background:var(--pnk-lt)">🏆</div><div class="mt2">Hackathons</div><div class="ms2">SIH: 3d left</div></div>
+        <div class="mod-c co" onclick="go('resources')"><div class="mi2" style="background:var(--ora-lt)">📚</div><div class="mt2">Resources</div><div class="ms2">500+ links</div></div>
+        <div class="mod-c ci" onclick="go('leaderboard')"><div class="mi2" style="background:var(--ind-lt)">🥇</div><div class="mt2">Leaderboard</div><div class="ms2">Your rank</div></div>
+      </div>
+
+      <div class="sect">Quick Stats</div>
+      <div class="g4">
+        <div class="cf"><div class="sect">DSA Streak</div><div style="font-family:var(--serif);font-size:28px;font-weight:900;color:var(--amb)">0 🔥</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Solve a problem to start!</div></div>
+        <div class="cf"><div class="sect">Problems Solved</div><div style="font-family:var(--serif);font-size:28px;font-weight:900;color:var(--ind)">0</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Start with Sheet 1</div></div>
+        <div class="cf"><div class="sect">ATS Score</div><div style="font-family:var(--serif);font-size:28px;font-weight:900;color:var(--grn)">—</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Upload your resume</div></div>
+        <div class="cf"><div class="sect">Applications</div><div style="font-family:var(--serif);font-size:28px;font-weight:900;color:var(--pnk)">0</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Apply to internships</div></div>
+      </div>
+    </div>
+
+    <!-- Placeholder pages -->
+    <div id="internships" class="page"><div class="pgt">💼 Internships</div><div class="pgs">48 live listings matched to your profile</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">💼</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">Internship Hub</div><div style="color:var(--text2);font-size:13.5px">Full internship module with filters, ATS match scoring, and one-click applications</div></div></div>
+    <div id="roadmaps" class="page"><div class="pgt">🗺️ Roadmaps</div><div class="pgs">Semester-by-semester guide + AI personalized plan</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🗺️</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">Roadmap Module</div><div style="color:var(--text2);font-size:13.5px">4-year ideal roadmap + AI-generated personalized weekly plan</div></div></div>
+    <div id="dsa" class="page"><div class="pgt">⚡ DSA Sheets</div><div class="pgs">3 sheets · 300 problems · Beginner to Advanced</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">⚡</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">DSA Module</div><div style="color:var(--text2);font-size:13.5px">Sheet 1 (50), Sheet 2 (100), Sheet 3 (150) with progress tracking</div></div></div>
+    <div id="beginner" class="page"><div class="pgt">🌱 Beginner Zone</div><div class="pgs">Start here if you're in Year 1 or new to CS</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🌱</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">Beginner Zone</div><div style="color:var(--text2);font-size:13.5px">Domain guide, language quiz (100 Qs), 30-100 day plans, FAQ</div></div></div>
+    <div id="resources" class="page"><div class="pgt">📚 A-to-Z Resources</div><div class="pgs">500+ curated links · Updated March 2026</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">📚</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">Resource Hub</div><div style="color:var(--text2);font-size:13.5px">Python, DSA, GenAI, Web Dev, Cloud, Hackathons, Internships, Books, YouTube</div></div></div>
+    <div id="resume" class="page"><div class="pgt">📄 Resume + ATS</div><div class="pgs">Build, score, improve with AI</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">📄</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">Resume Module</div><div style="color:var(--text2);font-size:13.5px">Builder + AI ATS scorer + Cover letter generator</div></div></div>
+    <div id="hackathons" class="page"><div class="pgt">🏆 Hackathons</div><div class="pgs">Competitions · Ideas · TeamUp</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🏆</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">Hackathon Hub</div><div style="color:var(--text2);font-size:13.5px">20+ hackathons, idea bank, LFG TeamUp</div></div></div>
+    <div id="leaderboard" class="page"><div class="pgt">🥇 Leaderboard</div><div class="pgs">Top students this week</div><div class="cf" style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🥇</div><div style="font-weight:700;font-size:15px;margin-bottom:6px">Leaderboard</div><div style="color:var(--text2);font-size:13.5px">Weekly + monthly rankings based on problems solved + streak</div></div></div>
+    <div id="profile" class="page">
+      <div class="pgt">👤 My Profile</div>
+      <div class="pgs">Your account & preferences</div>
+      <div class="g2" style="max-width:700px;align-items:start">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px">
+            <div id="prof-av" style="width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,var(--ind),var(--vio));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-weight:700;font-size:24px;box-shadow:var(--sh)">AK</div>
+            <div><div style="font-family:var(--serif);font-weight:700;font-size:19px" id="prof-name">Your Name</div><div style="font-size:13px;color:var(--text2)" id="prof-email">email@example.com</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px">
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bg4)"><span style="color:var(--text2)">College</span><span style="font-weight:600" id="prof-college">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bg4)"><span style="color:var(--text2)">Branch</span><span style="font-weight:600" id="prof-branch">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bg4)"><span style="color:var(--text2)">Year</span><span style="font-weight:600" id="prof-year">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0"><span style="color:var(--text2)">CGPA</span><span style="font-weight:600" id="prof-cgpa">—</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="sect">Account</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn bo bfull bsm" onclick="logout()">🚪 Sign Out</button>
+              <button class="btn" style="background:var(--cor-lt);color:var(--cor);border:1px solid var(--cor-md);width:100%" class="bsm">🗑️ Delete Account</button>
+            </div>
+          </div>
+          <div class="cf">
+            <div class="sect">Security</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7">Your account is protected with Firebase Auth. Passwords are never stored in plain text. Phone OTP uses Firebase SMS verification.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mobile Nav -->
+  <nav class="mob-nav">
+    <div class="mni on" onclick="go('dashboard')"><div class="mic">🏠</div><div>Home</div></div>
+    <div class="mni" onclick="go('internships')"><div class="mic">💼</div><div>Intern</div></div>
+    <div class="mni" onclick="go('dsa')"><div class="mic">⚡</div><div>DSA</div></div>
+    <div class="mni" onclick="go('beginner')"><div class="mic">🌱</div><div>Beginner</div></div>
+    <div class="mni" onclick="go('resources')"><div class="mic">📚</div><div>Resources</div></div>
+  </nav>
+</div>
+
+<!-- Notif Panel -->
+<div id="notif-panel" style="display:none;position:fixed;top:var(--hh);right:16px;z-index:300;width:340px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);box-shadow:var(--shxl);overflow:hidden;animation:fade .2s">
+  <div style="padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between"><div style="font-weight:700;font-size:14px">Notifications</div><button onclick="toggleNotif()" class="bgr" style="font-size:16px">✕</button></div>
+  <div style="max-height:380px;overflow-y:auto">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--bg4);background:var(--ind-lt);cursor:pointer"><div style="display:flex;gap:10px"><div style="font-size:18px;flex-shrink:0">💼</div><div><div style="font-weight:600;font-size:13px;margin-bottom:2px">3 new internships match your profile</div><div style="font-size:11.5px;color:var(--text2)">Swiggy, Razorpay, ISRO added</div><div style="font-size:11px;color:var(--text3);margin-top:3px">5 min ago</div></div></div></div>
+    <div style="padding:12px 16px;border-bottom:1px solid var(--bg4);background:var(--ind-lt);cursor:pointer"><div style="display:flex;gap:10px"><div style="font-size:18px;flex-shrink:0">🔥</div><div><div style="font-weight:600;font-size:13px;margin-bottom:2px">Start your DSA streak today!</div><div style="font-size:11.5px;color:var(--text2)">Solve 1 problem to begin your streak</div><div style="font-size:11px;color:var(--text3);margin-top:3px">1 hr ago</div></div></div></div>
+    <div style="padding:12px 16px;cursor:pointer"><div style="display:flex;gap:10px"><div style="font-size:18px;flex-shrink:0">🎉</div><div><div style="font-weight:600;font-size:13px;margin-bottom:2px">Welcome to StudentOS!</div><div style="font-size:11.5px;color:var(--text2)">Your account is set up. Start exploring!</div><div style="font-size:11px;color:var(--text3);margin-top:3px">Just now</div></div></div></div>
+  </div>
+</div>
+
+<!-- AI Panel -->
+<div id="ai-panel" style="display:none;position:fixed;bottom:20px;right:20px;z-index:400;width:380px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);box-shadow:var(--shxl);overflow:hidden;flex-direction:column">
+  <div style="padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--ind-lt),var(--vio-lt))">
+    <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--ind),var(--vio));display:flex;align-items:center;justify-content:center;font-size:17px">🤖</div>
+    <div style="flex:1"><div style="font-weight:700;font-size:13.5px">AI Study Buddy</div><div style="font-size:11px;color:var(--text2)">Ask anything career-related</div></div>
+    <button onclick="toggleAI()" class="bgr" style="font-size:16px">✕</button>
+  </div>
+  <div id="ai-msgs" style="height:300px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px">
+    <div style="padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.6;max-width:88%;background:var(--bg3);border:1px solid rgba(0,0,0,.04);align-self:flex-start">👋 Hi! I'm your AI Study Buddy. Ask me anything about your career path, study plan, or internship strategy!</div>
+  </div>
+  <div style="padding:10px;border-top:1px solid var(--border);display:flex;gap:7px">
+    <input class="fi" id="ai-inp" placeholder="Ask anything…" style="flex:1;padding:8px 12px;font-size:13px" onkeydown="if(event.key==='Enter')sendAI()">
+    <button class="btn bp bsm" onclick="sendAI()">→</button>
+  </div>
+</div>
+
+<!-- Upgrade Modal -->
+<div id="overlay" class="overlay" onclick="if(event.target===this)closeMod()">
+  <div class="modal" id="modal-upgrade" style="display:none">
+    <button class="mc2" onclick="closeMod()">✕</button>
+    <div style="text-align:center;margin-bottom:20px"><div style="font-size:44px;margin-bottom:10px">✨</div><div style="font-family:var(--serif);font-size:22px;font-weight:900;margin-bottom:5px">Upgrade to Pro</div><div style="font-size:13.5px;color:var(--text2)">₹299/month · 7-day free trial · cancel anytime</div></div>
+    <div style="margin-bottom:20px">
+      <div style="padding:10px 0;border-bottom:1px solid var(--bg4);font-size:13.5px;display:flex;gap:9px"><span style="color:var(--grn)">✓</span>Personalized AI roadmap (week-by-week)</div>
+      <div style="padding:10px 0;border-bottom:1px solid var(--bg4);font-size:13.5px;display:flex;gap:9px"><span style="color:var(--grn)">✓</span>DSA Sheet 3 – 150 Advanced problems</div>
+      <div style="padding:10px 0;border-bottom:1px solid var(--bg4);font-size:13.5px;display:flex;gap:9px"><span style="color:var(--grn)">✓</span>Unlimited AI ATS scorer + keyword suggestions</div>
+      <div style="padding:10px 0;border-bottom:1px solid var(--bg4);font-size:13.5px;display:flex;gap:9px"><span style="color:var(--grn)">✓</span>AI Cover Letter generator</div>
+      <div style="padding:10px 0;border-bottom:1px solid var(--bg4);font-size:13.5px;display:flex;gap:9px"><span style="color:var(--grn)">✓</span>Priority internship &amp; hackathon alerts</div>
+      <div style="padding:10px 0;border-bottom:1px solid var(--bg4);font-size:13.5px;display:flex;gap:9px"><span style="color:var(--grn)">✓</span>All resume templates (3+)</div>
+      <div style="padding:10px 0;font-size:13.5px;display:flex;gap:9px"><span style="color:var(--grn)">✓</span>Mock interview tracker</div>
+    </div>
+    <button class="btn bp bfull" style="font-size:15px;padding:12px" onclick="closeMod()">Start Free Trial →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     AUTH LOGIC
+     PREVIEW MODE: uses localStorage (works everywhere)
+     PRODUCTION: swap this block with Firebase — see DEPLOYMENT_GUIDE.md
+══════════════════════════════════════════════ -->
+<script>
+// ─────────────────────────────────────────────
+// STORAGE HELPERS (localStorage — works in preview & as PWA)
+// When you add Firebase, replace these two functions only.
+// ─────────────────────────────────────────────
+var _DB_KEY = 'sos_users';
+var _SESSION = 'sos_session';
+
+function dbGetUser(uid) {
+  try {
+    var all = JSON.parse(localStorage.getItem(_DB_KEY) || '{}');
+    return all[uid] || null;
+  } catch(e) { return null; }
+}
+function dbSaveUser(uid, data) {
+  try {
+    var all = JSON.parse(localStorage.getItem(_DB_KEY) || '{}');
+    all[uid] = Object.assign(all[uid] || {}, data);
+    localStorage.setItem(_DB_KEY, JSON.stringify(all));
+  } catch(e) {}
+}
+function getSession() {
+  try { return JSON.parse(localStorage.getItem(_SESSION)); } catch(e) { return null; }
+}
+function saveSession(user) {
+  try { localStorage.setItem(_SESSION, JSON.stringify(user)); } catch(e) {}
+}
+function clearSession() {
+  try { localStorage.removeItem(_SESSION); } catch(e) {}
+}
+function makeUID() {
+  return 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+// ─────────────────────────────────────────────
+// BOOT — check session on load
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    hideLoading();
+    var session = getSession();
+    if (session && session.uid) {
+      var profile = dbGetUser(session.uid);
+      if (profile && profile.onboardingDone) {
+        populateApp(session, profile);
+        showApp();
+      } else {
+        showView('view-onboarding');
+      }
+    } else {
+      showView('view-login');
+    }
+  }, 800);
+});
+
+// ─────────────────────────────────────────────
+// GOOGLE AUTH (demo — shows a simulated flow)
+// In production: replace body with Firebase signInWithPopup
+// ─────────────────────────────────────────────
+function authGoogle() {
+  var btn = document.getElementById('btn-google') || document.getElementById('btn-google-reg');
+  setLoading(btn, true);
+  // Simulate Google popup delay
+  setTimeout(function() {
+    var uid = makeUID();
+    var user = { uid: uid, name: 'Demo User', email: 'demo@gmail.com', provider: 'google' };
+    saveSession(user);
+    var existing = dbGetUser(uid);
+    if (!existing || !existing.onboardingDone) {
+      dbSaveUser(uid, { uid: uid, name: 'Demo User', email: 'demo@gmail.com', plan: 'free', onboardingDone: false, streak: 0, problemsSolved: 0 });
+      setLoading(btn, false);
+      showView('view-onboarding');
+    } else {
+      setLoading(btn, false);
+      populateApp(user, existing);
+      showApp();
+    }
+  }, 1200);
+}
+
+// ─────────────────────────────────────────────
+// EMAIL SIGN IN
+// ─────────────────────────────────────────────
+function authEmail() {
+  var email = document.getElementById('login-email').value.trim();
+  var pw    = document.getElementById('login-password').value;
+  var valid = true;
+  if (!email || !email.includes('@')) { showFieldErr('err-login-email'); valid = false; } else hideFieldErr('err-login-email');
+  if (!pw) { showFieldErr('err-login-pw'); valid = false; } else hideFieldErr('err-login-pw');
+  if (!valid) return;
+
+  var btn = document.getElementById('btn-login');
+  setLoading(btn, true);
+
+  setTimeout(function() {
+    // Check if account exists
+    var all = JSON.parse(localStorage.getItem(_DB_KEY) || '{}');
+    var found = null;
+    Object.values(all).forEach(function(u) { if (u.email === email && u.pw === btoa(pw)) found = u; });
+
+    if (!found) {
+      showAuthError('login-alert', 'login-alert-msg', 'No account found. Please register first, or check your password.');
+      setLoading(btn, false);
+      return;
+    }
+    saveSession(found);
+    var profile = dbGetUser(found.uid);
+    if (profile && profile.onboardingDone) {
+      populateApp(found, profile);
+      showApp();
+    } else {
+      showView('view-onboarding');
+    }
+    setLoading(btn, false);
+  }, 900);
+}
+
+// ─────────────────────────────────────────────
+// EMAIL REGISTER
+// ─────────────────────────────────────────────
+function authRegister() {
+  var name  = document.getElementById('reg-name').value.trim();
+  var email = document.getElementById('reg-email').value.trim();
+  var pw    = document.getElementById('reg-password').value;
+  var agree = document.getElementById('reg-agree').checked;
+  var valid = true;
+
+  if (!name)                        { showFieldErr('err-reg-name');  valid = false; } else hideFieldErr('err-reg-name');
+  if (!email || !email.includes('@')){ showFieldErr('err-reg-email'); valid = false; } else hideFieldErr('err-reg-email');
+  if (pw.length < 8)                { showFieldErr('err-reg-pw');   valid = false; } else hideFieldErr('err-reg-pw');
+  if (!agree) { showAuthError('reg-alert','reg-alert-msg','Please agree to the Terms to continue'); valid = false; }
+  if (!valid) return;
+
+  var btn = document.getElementById('btn-register');
+  setLoading(btn, true);
+
+  setTimeout(function() {
+    // Check duplicate email
+    var all = JSON.parse(localStorage.getItem(_DB_KEY) || '{}');
+    var dup = Object.values(all).some(function(u) { return u.email === email; });
+    if (dup) {
+      showAuthError('reg-alert','reg-alert-msg','An account with this email already exists. Please sign in.');
+      setLoading(btn, false);
+      return;
+    }
+    var uid = makeUID();
+    var user = { uid: uid, name: name, email: email, pw: btoa(pw), provider: 'email', plan: 'free', onboardingDone: false, streak: 0, problemsSolved: 0 };
+    dbSaveUser(uid, user);
+    saveSession({ uid: uid, name: name, email: email, provider: 'email' });
+    setLoading(btn, false);
+    showView('view-onboarding');
+  }, 900);
+}
+
+// ─────────────────────────────────────────────
+// PHONE OTP (simulated — uses 123456 as test OTP)
+// In production: replace with Firebase signInWithPhoneNumber
+// ─────────────────────────────────────────────
+var _phoneNum = '';
+var _resendTimer = null;
+
+function sendOTP() {
+  var num = document.getElementById('phone-number').value.trim();
+  if (num.length !== 10 || !/^\d+$/.test(num)) { showFieldErr('err-phone'); return; }
+  hideFieldErr('err-phone');
+  _phoneNum = num;
+
+  var btn = document.getElementById('btn-send-otp');
+  setLoading(btn, true);
+  setTimeout(function() {
+    setLoading(btn, false);
+    document.getElementById('phone-step1').style.display = 'none';
+    document.getElementById('phone-step2').style.display = 'block';
+    document.getElementById('otp-sent-to').textContent = 'OTP sent to +91 ' + num.slice(0,5) + 'XXXXX';
+    document.getElementById('otp-ok').classList.add('on');
+    document.querySelectorAll('.otp-digit')[0].focus();
+    startResendTimer();
+    // Show test hint
+    setTimeout(function() {
+      var hint = document.getElementById('otp-ok');
+      if (hint) hint.querySelector('span:last-child').textContent = 'OTP sent! (Test OTP: 1 2 3 4 5 6)';
+    }, 200);
+  }, 1500);
+}
+
+function verifyOTP() {
+  var digits = Array.from(document.querySelectorAll('.otp-digit')).map(function(i){ return i.value; }).join('');
+  if (digits.length !== 6) { showAuthError('otp-alert','otp-alert-msg','Please enter the complete 6-digit OTP'); return; }
+
+  var btn = document.getElementById('btn-verify-otp');
+  setLoading(btn, true);
+  setTimeout(function() {
+    if (digits !== '123456') {
+      showAuthError('otp-alert','otp-alert-msg','Invalid OTP. Use test OTP: 123456');
+      setLoading(btn, false);
+      return;
+    }
+    var uid = makeUID();
+    var user = { uid: uid, name: 'Phone User', phone: '+91' + _phoneNum, provider: 'phone', plan: 'free', onboardingDone: false, streak: 0, problemsSolved: 0 };
+    dbSaveUser(uid, user);
+    saveSession({ uid: uid, name: 'Phone User', phone: '+91' + _phoneNum, provider: 'phone' });
+    setLoading(btn, false);
+    showView('view-onboarding');
+  }, 1200);
+}
+
+function resendOTP() {
+  document.getElementById('phone-step2').style.display = 'none';
+  document.getElementById('phone-step1').style.display = 'block';
+  document.getElementById('otp-ok').classList.remove('on');
+}
+
+function startResendTimer() {
+  var count = 30;
+  document.getElementById('resend-count').textContent = count;
+  document.getElementById('resend-timer').style.display = 'inline';
+  document.getElementById('resend-btn').style.display = 'none';
+  if (_resendTimer) clearInterval(_resendTimer);
+  _resendTimer = setInterval(function() {
+    count--;
+    document.getElementById('resend-count').textContent = count;
+    if (count <= 0) {
+      clearInterval(_resendTimer);
+      document.getElementById('resend-timer').style.display = 'none';
+      document.getElementById('resend-btn').style.display = 'inline';
+    }
+  }, 1000);
+}
+
+// ─────────────────────────────────────────────
+// PASSWORD RESET (simulated)
+// ─────────────────────────────────────────────
+function sendReset() {
+  var email = document.getElementById('forgot-email').value.trim();
+  if (!email || !email.includes('@')) return;
+  var btn = document.getElementById('btn-forgot');
+  setLoading(btn, true);
+  setTimeout(function() {
+    document.getElementById('forgot-ok').classList.add('on');
+    document.getElementById('forgot-alert').classList.remove('on');
+    setLoading(btn, false);
+  }, 1000);
+}
+
+// ─────────────────────────────────────────────
+// SIGN OUT
+// ─────────────────────────────────────────────
+function logout() {
+  if (!confirm('Are you sure you want to sign out?')) return;
+  clearSession();
+  showView('view-login');
+  hideApp();
+}
+
+// ─────────────────────────────────────────────
+// ONBOARDING SAVE
+// ─────────────────────────────────────────────
+function launchApp() {
+  var btn = document.getElementById('btn-launch');
+  setLoading(btn, true);
+  var session = getSession();
+  if (!session) { setLoading(btn, false); return; }
+
+  var selectedDomains = Array.from(document.querySelectorAll('.dom-btn.on')).map(function(b){ return b.dataset.d; });
+  var profileData = {
+    onboardingDone: true,
+    college: document.getElementById('ob-college').value.trim(),
+    branch: document.getElementById('ob-branch').value,
+    cgpa: parseFloat(document.getElementById('ob-cgpa').value) || null,
+    year: (window._obData && window._obData.year) || null,
+    level: (window._obData && window._obData.level) || 'beginner',
+    targetRole: document.getElementById('ob-role').value,
+    targetPackage: (window._obData && window._obData.pkg) || '8-15',
+    domains: selectedDomains
+  };
+
+  dbSaveUser(session.uid, profileData);
+  var fullProfile = dbGetUser(session.uid);
+  populateApp(session, fullProfile);
+  setLoading(btn, false);
+  showApp();
+}
+
+// ─────────────────────────────────────────────
+// POPULATE APP UI WITH USER DATA
+// ─────────────────────────────────────────────
+function populateApp(user, profile) {
+  var name = (profile && profile.name) || (user && user.name) || 'Student';
+  var initials = name.split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+  var hr = new Date().getHours();
+  var greeting = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  var firstName = name.split(' ')[0];
+
+  var hav = document.getElementById('h-avatar');
+  if (hav) hav.textContent = initials;
+
+  var dg = document.getElementById('dash-greeting');
+  if (dg) dg.textContent = greeting + ', ' + firstName + ' \uD83D\uDC4B';
+
+  var ds = document.getElementById('dash-sub');
+  if (ds) ds.textContent = (profile && profile.streak) ? '\uD83D\uDD25 ' + profile.streak + '-day streak! Keep going!' : 'Welcome to StudentOS \u2014 let\'s get started!';
+
+  var pav = document.getElementById('profile-av');
+  if (pav) pav.textContent = initials;
+
+  var pname = document.getElementById('profile-name');
+  if (pname) pname.textContent = name;
+
+  var ptags = document.getElementById('profile-tags');
+  if (ptags && profile) {
+    var tags = [];
+    if (profile.branch) tags.push('<span class="tag ti">' + profile.branch.split('\u2014')[0].trim() + ' \u00B7 Year ' + (profile.year || '?') + '</span>');
+    if (profile.cgpa) tags.push('<span class="tag ta">CGPA ' + profile.cgpa + '</span>');
+    if (profile.targetRole) tags.push('<span class="tag tb">' + profile.targetRole.split('(')[0].trim() + '</span>');
+    if (profile.level) {
+      var lv = profile.level === 'beginner' ? '\uD83C\uDF31 Beginner' : profile.level === 'intermediate' ? '\u26A1 Intermediate' : '\uD83D\uDD25 Advanced';
+      tags.push('<span class="tag tg">' + lv + '</span>');
+    }
+    ptags.innerHTML = tags.length ? tags.join('') : '<span class="tag tn">Complete your profile \u2192</span>';
+  }
+
+  var profav = document.getElementById('prof-av');
+  if (profav) profav.textContent = initials;
+  var profname = document.getElementById('prof-name');
+  if (profname) profname.textContent = name;
+  var profemail = document.getElementById('prof-email');
+  if (profemail) profemail.textContent = (user && (user.email || user.phone)) || '\u2014';
+
+  ['college','branch','year','cgpa'].forEach(function(f) {
+    var el = document.getElementById('prof-' + f);
+    if (el) el.textContent = (profile && profile[f]) || '\u2014';
+  });
+}
+</script>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// NON-FIREBASE GLOBAL FUNCTIONS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+window._obData = { year: null, level: null, pkg: null };
+
+// View management
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('on');
+}
+function showApp() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.getElementById('app').classList.add('on');
+}
+function hideApp() {
+  document.getElementById('app').classList.remove('on');
+}
+function hideLoading() {
+  const l = document.getElementById('loading');
+  l.classList.add('hidden');
+  setTimeout(() => l.style.display = 'none', 400);
+}
+
+// App navigation
+function go(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nl').forEach(n => n.classList.remove('on'));
+  document.querySelectorAll('.mni').forEach(n => n.classList.remove('on'));
+  const pg = document.getElementById(page);
+  if (pg) pg.classList.add('on');
+  document.querySelectorAll('.nl').forEach(n => { if(n.getAttribute('onclick')?.includes("'"+page+"'")) n.classList.add('on'); });
+  document.querySelectorAll('.mni').forEach(n => { if(n.getAttribute('onclick')?.includes("'"+page+"'")) n.classList.add('on'); });
+  closeAllPanels();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Tabs
+function sw(el, pid) {
+  const tb = el.closest('.tabs');
+  tb?.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  const par = tb?.parentElement;
+  par?.querySelectorAll('.tp').forEach(p => p.classList.remove('on'));
+  const pan = document.getElementById(pid);
+  if (pan) pan.classList.add('on');
+}
+
+// Modals
+function showMod(id) {
+  document.getElementById('overlay').classList.add('on');
+  document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+  const m = document.getElementById('modal-' + id);
+  if (m) m.style.display = 'block';
+}
+function closeMod() {
+  document.getElementById('overlay').classList.remove('on');
+}
+
+// Panels
+function toggleNotif() {
+  const p = document.getElementById('notif-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('ai-panel').style.display = 'none';
+}
+function toggleAI() {
+  const p = document.getElementById('ai-panel');
+  const showing = p.style.display !== 'none';
+  p.style.display = showing ? 'none' : 'flex';
+  p.style.flexDirection = 'column';
+  document.getElementById('notif-panel').style.display = 'none';
+}
+function closeAllPanels() {
+  document.getElementById('notif-panel').style.display = 'none';
+  document.getElementById('ai-panel').style.display = 'none';
+}
+
+// Loading states
+function setLoading(btn, on) {
+  if (!btn) return;
+  btn.classList.toggle('bload', on);
+}
+
+// Error helpers
+function showFieldErr(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('on');
+}
+function hideFieldErr(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('on');
+}
+function showAuthError(alertId, msgId, msg) {
+  const alert = document.getElementById(alertId);
+  const msgEl = document.getElementById(msgId);
+  if (alert && msgEl) { msgEl.textContent = msg; alert.classList.add('on'); }
+  setTimeout(() => alert?.classList.remove('on'), 5000);
+}
+
+// Firebase error messages
+function getFirebaseError(code) {
+  const msgs = {
+    'auth/user-not-found': 'No account found with this email. Please register first.',
+    'auth/wrong-password': 'Incorrect password. Try forgot password if you forgot it.',
+    'auth/email-already-in-use': 'An account with this email already exists. Please sign in.',
+    'auth/weak-password': 'Password too weak. Use at least 8 characters with numbers.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes and try again.',
+    'auth/network-request-failed': 'Network error. Please check your internet connection.',
+    'auth/popup-closed-by-user': 'Sign-in window was closed. Please try again.',
+    'auth/cancelled-popup-request': 'Another sign-in is in progress.',
+    'auth/invalid-verification-code': 'Invalid OTP. Please check the 6 digits and try again.',
+    'auth/code-expired': 'OTP has expired. Please request a new one.',
+  };
+  return msgs[code] || 'Something went wrong. Please try again.';
+}
+
+// Password strength
+function checkPWStrength(pw) {
+  const fill = document.getElementById('pw-fill');
+  const text = document.getElementById('pw-str-text');
+  if (!fill || !text) return;
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = [
+    {w:'0%',c:'transparent',t:''},
+    {w:'25%',c:'var(--cor)',t:'Weak'},
+    {w:'50%',c:'var(--amb)',t:'Fair'},
+    {w:'75%',c:'var(--amb)',t:'Good'},
+    {w:'85%',c:'var(--grn)',t:'Strong'},
+    {w:'100%',c:'var(--grn)',t:'Very Strong'}
+  ];
+  const l = levels[Math.min(score, 5)];
+  fill.style.width = l.w;
+  fill.style.background = l.c;
+  text.textContent = l.t;
+  text.style.color = l.c;
+}
+
+// Toggle password visibility
+function togglePW(inputId, eye) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  eye.textContent = inp.type === 'password' ? '👁️' : '🙈';
+}
+
+// OTP input navigation
+function otpInput(el) {
+  el.classList.toggle('filled', el.value !== '');
+  if (el.value && el.nextElementSibling) el.nextElementSibling.focus();
+}
+function otpKeydown(e, el) {
+  if (e.key === 'Backspace' && !el.value && el.previousElementSibling) {
+    el.previousElementSibling.focus();
+    el.previousElementSibling.value = '';
+    el.previousElementSibling.classList.remove('filled');
+  }
+}
+
+// Paste OTP
+document.addEventListener('paste', function(e) {
+  const digits = document.querySelectorAll('.otp-digit');
+  if (!digits.length) return;
+  const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+  if (pasted.length >= 4) {
+    e.preventDefault();
+    pasted.split('').forEach((d, i) => { if(digits[i]) { digits[i].value = d; digits[i].classList.add('filled'); } });
+    digits[Math.min(pasted.length, 5)].focus();
+  }
+});
+
+// Onboarding navigation
+let obStep = 1;
+function obNext(n) {
+  document.getElementById('ob'+obStep)?.classList.remove('on');
+  document.getElementById('ob-d'+obStep)?.classList.remove('on');
+  document.getElementById('ob-d'+obStep)?.classList.add('done');
+  document.getElementById('ob-d'+obStep)?.textContent = '✓';
+  const line = document.getElementById('ob-l'+(obStep));
+  if (line) line.classList.add('done');
+  obStep = n;
+  document.getElementById('ob'+obStep)?.classList.add('on');
+  document.getElementById('od'+obStep)?.classList.add('on');
+}
+function obBack(n) {
+  document.getElementById('ob'+obStep)?.classList.remove('on');
+  obStep = n;
+  document.getElementById('ob'+obStep)?.classList.add('on');
+  document.getElementById('od'+(obStep+1))?.classList.remove('on');
+  document.getElementById('od'+(obStep+1))?.classList.remove('done');
+  document.getElementById('od'+(obStep+1))?.textContent = obStep+1;
+  const line = document.getElementById('ol'+obStep);
+  if (line) line.classList.remove('done');
+  document.getElementById('od'+obStep)?.classList.add('on');
+}
+
+// Onboarding selections
+function selOb(type, val, el) {
+  const grid = el.closest('[id*="grid"]') || el.parentElement;
+  grid.querySelectorAll('.yr-btn,.lvl-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  window._obData[type] = val;
+}
+function toggleDom(el) {
+  el.classList.toggle('on');
+}
+
+// AI Chat (demo — replace with your Vercel function)
+const aiReplies = {
+  'study':()=>`Based on your profile, here's this week's plan:<br><br><strong>DSA:</strong> 5-7 medium LeetCode (Trees/DP focus)<br><strong>Core CS:</strong> 1-2 OS chapters (Gate Smashers YouTube)<br><strong>Project:</strong> 30 min/day on current project<br><br>You're on track! 🎯`,
+  'internship':()=>`For your profile, best matches right now:<br><br>✦ Swiggy SDE Backend — ₹25k/mo, 5 days left<br>✦ Razorpay Full Stack — ₹35k/mo, open<br>✦ ISRO Web Dev — ₹15k/mo, govt, 8d left<br><br><strong>Tip:</strong> Improve your ATS score to 85+ before applying to MNCs.`,
+  'cgpa':()=>`Honest answer: most product companies filter at ≥7.0 CGPA. Your 7.8 is already above most cutoffs. Focus on skills after this.<br><br>Use the CGPA Predictor to see what SGPA you need this semester.`,
+  'default':()=>`I can help with:<br>• 📅 Study plans based on your profile<br>• 💼 Internship recommendations<br>• 🗺️ Domain roadmaps<br>• 📊 CGPA advice<br>• 📄 Resume & ATS tips<br><br>Ask me something specific!`
+};
+
+function sendAI() {
+  const inp = document.getElementById('ai-inp');
+  const msgs = document.getElementById('ai-msgs');
+  const msg = inp.value.trim(); if (!msg) return;
+  msgs.innerHTML += `<div style="padding:10px 13px;border-radius:12px 12px 3px 12px;font-size:13px;line-height:1.6;max-width:88%;background:var(--ind);color:#fff;align-self:flex-end">${msg}</div>`;
+  inp.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const key = Object.keys(aiReplies).find(k => msg.toLowerCase().includes(k)) || 'default';
+    msgs.innerHTML += `<div style="padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.6;max-width:88%;background:var(--bg3);border:1px solid rgba(0,0,0,.04);align-self:flex-start">${aiReplies[key]()}</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 700);
+}
+
+// ESC key
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeMod(); closeAllPanels(); } });
+</script>
+</body>
+</html>
